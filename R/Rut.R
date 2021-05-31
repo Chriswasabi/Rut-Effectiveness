@@ -157,8 +157,6 @@ pmis_processing <- function(database) {
   df3 <- df2 %>% group_by(FY, hwy, proj_ID) %>% summarise(proj_len = max(UT_dfot)- min(UT_dfof),
                                                           proj_beg = min(UT_dfof),
                                                           proj_end = max(UT_dfot),
-                                                          rutl_sum = sum(rutl)/n(),
-                                                          rutr_sum = sum(rutr)/n(),
                                                           T_improv_sum= sum(improv)/n()) %>% ungroup()
 
   df3 <- df3 %>% mutate ( Work_type = ifelse(T_improv_sum> quantile(df3$T_improv_sum, probs = 0.93),"HR",

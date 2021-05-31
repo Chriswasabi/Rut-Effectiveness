@@ -157,6 +157,8 @@ pmis_processing <- function(database) {
   df3 <- df2 %>% group_by(FY, hwy, proj_ID) %>% summarise(proj_len = max(UT_dfot)- min(UT_dfof),
                                                           proj_beg = min(UT_dfof),
                                                           proj_end = max(UT_dfot),
+                                                          rutl_sum = sum(rutl)/n(),
+                                                          rutr_sum = sum(rutr)/n(),
                                                           T_improv_sum= sum(improv)/n()) %>% ungroup()
 
   df3 <- df3 %>% mutate ( Work_type = ifelse(T_improv_sum> quantile(df3$T_improv_sum, probs = 0.93),"HR",
@@ -165,10 +167,30 @@ pmis_processing <- function(database) {
 
   #This adds the county to the project database
   df3 <- left_join(df3, df2, by=c("FY"="FY", "proj_ID"="proj_ID", "hwy"="hwy")) %>%
-    select( FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, T_improv_sum, Work_type)
+    select( FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, rutl_sum, rutr_sum, T_improv_sum, Work_type)
 
-  df3 <- df3 %>% group_by(FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, T_improv_sum, Work_type) %>%
+  df3 <- df3 %>% group_by(FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, rutl_sum, rutr_sum, T_improv_sum, Work_type) %>%
     summarise( section_count =n() ) %>% ungroup()
 
   return(df3)
+}
+
+#' Get the Rut work history
+#' @export
+#' @param database This is the output of the preprocessing function
+#' @param workhistory This is the output of the processing function
+treat_assing <- function(database, workhistory) {
+
+  db.1 = database %>% filter(FY==2018)
+  df <- workhistory %>% select(hwy,proj_beg,proj_end,Work_type)
+
+  data <- left_join(db.1, df, by=c("hwy"="hwy"))
+  data1 <- data %>% filter(UT_dfof>= proj_beg & UT_dfot<= proj_end) %>% unique() %>% select(hwy, UT_dfof, UT_dfot, Work_type)
+
+  df1 <- left_join(db.1, data1, by=c("hwy"="hwy", "UT_dfof"="UT_dfof", "UT_dfot"="UT_dfot")) %>% distinct()
+
+  df1$Work_type[is.na(df1$Work_type)] <- "DN"
+
+
+  return(df1)
 }

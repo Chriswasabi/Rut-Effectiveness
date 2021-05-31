@@ -2,3 +2,4 @@
 
 export(pmis_preprocessing)
 export(pmis_processing)
+export(treat_assing)

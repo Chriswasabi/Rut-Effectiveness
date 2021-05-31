@@ -200,3 +200,43 @@ treat_assing <- function(database, workhistory) {
 
   return(t12)
 }
+
+#' Get the Rut work history and prepare for plotting
+#' @export
+#' @param database This is the output of the treat_assign function
+#' @param workhistory This is the output of the processing function
+plotter <- function(database, workhistory) {
+
+  data <- workhistory %>% select(proj_ID, hwy, proj_beg, proj_end) %>% distinct
+  #Isolate the beginning of the project begin and end
+  hwy_list <- data$hwy %>% unique()
+
+
+  for (i in 1:lenght(hwy_list)) {
+
+    p <- database %>% filter(hwy == hwy_list[i])
+    beg = workhistory %>% filter(hwy == hwy_list[i]) %>% select(proj_beg) %>% distinct()
+    beg = beg$proj_beg
+    end = workhistory %>% filter(hwy == hwy_list[i]) %>% select(proj_end) %>% distinct()
+    end = end$proj_end
+
+    p1 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
+      geom_line(data = p, aes(y=rutl, x =UT_dfof), color="red") +
+      geom_line(data = p, aes(y=rutl19, x =UT_dfof), color ="black")
+
+
+    p2 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
+      geom_line(data = p, aes(y=rutr, x =UT_dfof), color="red") +
+      geom_line(data = p, aes(y=rutr19, x =UT_dfof), color ="black")
+
+    p3 = plot_grid(p1,p2, nrow=2, labels = c('L', 'R'))
+
+
+    save_plot(filename = paste0("Plot ", i, ".jpg"), p3, ncol = 1, nrow = 1, base_height = 3.71*2,
+              base_asp = 1.618)
+
+    print(paste0("Graph ", i, " done"))
+
+  }
+
+}

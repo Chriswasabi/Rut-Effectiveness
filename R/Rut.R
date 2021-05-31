@@ -13,7 +13,6 @@ pmis_preprocessing <- function(database, corrected_DFOS, min_year, max_year, asp
   #Rename and select the variables of interest for ACP
   df <- database %>% select(FY=EFF_YEAR, hwy=ROUTE_NAME, distr=TX_DISTRICT_NUM_ID, county=TX_COUNTY_NBR,
                             dfof=OFFSET_FROM, dfot=OFFSET_TO, pvmt_type=TX_PVMNT_TYPE_DTL_RD_LIFE_CODE,
-                            lcr=TX_ACP_LONGITUDE_CRACKING_PCT, iril=TX_IRI_LEFT_SCORE, irir=TX_IRI_RIGHT_SCORE,
                             rutl=TX_ACP_RUT_LFT_WP_DPTH_MEAS,rutr=TX_ACP_RUT_RIT_WP_DPTH_MEAS)
 
 
@@ -23,10 +22,6 @@ pmis_preprocessing <- function(database, corrected_DFOS, min_year, max_year, asp
 
   #Create the section length and Highway class variables
   df <- df %>% mutate(sec_len=dfot-dfof, HC=substr(hwy, start = 1, stop = 2))
-
-  #Convert zeroes into NA
-  df$iril[df$iril == 0] <- NA
-  df$irir[df$irir == 0] <- NA
 
   #Compute the network length per year
   netw_len <- df %>% group_by(FY) %>% filter(FY>=min_year & FY<=max_year) %>%
@@ -68,32 +63,25 @@ pmis_processing <- function(database) {
   t1$sec_ID <- group_indices(t1,hwy,UT_dfof, UT_dfot, distr,county)
 
   #Compute the difference in performance measures year(i+1)-year(i)
-  df <- t1 %>% group_by(sec_ID) %>% mutate(dlcr=c(diff(lcr),NA),  diril=c(diff(iril),NA),
-                                           dirir=c(diff(irir),NA), drutl=c(diff(rutl),NA), drutr=c(diff(rutr),NA)
-  ) %>% ungroup()
+  df <- t1 %>% group_by(sec_ID) %>% mutate( drutl=c(diff(rutl),NA), drutr=c(diff(rutr),NA)) %>% ungroup()
 
   #Define the threshold value for each distress/performance measure (first "t" means threshold)
-  tlcr <- -14; tiril <- -10 ; tirir <- -13 ; trutl <- -0.01; trutr <- -0.019
+  trutl <- quantile(df$drutl, na.rm = T, probs = c(0.1)); trutr <- quantile(df$drutr, na.rm = T, probs = c(0.1))
+
 
   #Flag each section based on the difference in distress/performance measures from one year to the next
   df <- df %>% mutate(
-    t1 = ifelse(dlcr<=tlcr, 0.25, 0), #Longitudinal Cracking
-    t2 = ifelse(diril<=tiril, 0.25, 0), #IRI Left
-    t3 = ifelse(dirir<=tirir, 0.25, 0), #IRI Right
     t4 = ifelse(drutl<=trutl, 2, 0), #Rut Left
     t5 = ifelse(drutr<=trutr, 2.25, 0), #Rut Right
   )
 
   #Convert NA's into zeroes (fix)
-  df$t1[is.na(df$t1)] <- 0
-  df$t2[is.na(df$t2)] <- 0
-  df$t3[is.na(df$t3)] <- 0
   df$t4[is.na(df$t4)] <- 0
   df$t5[is.na(df$t5)] <- 0
 
 
   #Define the Flag score
-  df <- df %>% mutate(flag_score=t1+t2+t3+t4+t5)
+  df <- df %>% mutate(flag_score=t4+t5)
 
   #Filter out any section whose flag score is less than the flag threshold
   tflag <- quantile(df$flag_score, probs = c(0.88)) ; df <- df %>%  filter(flag_score>=tflag)
@@ -207,12 +195,14 @@ treat_assing <- function(database, workhistory) {
 #' @param workhistory This is the output of the processing function
 plotter <- function(database, workhistory) {
 
+  setwd("C:/Users/Owner/Desktop/Graphs")
+
   data <- workhistory %>% select(proj_ID, hwy, proj_beg, proj_end) %>% distinct
   #Isolate the beginning of the project begin and end
   hwy_list <- data$hwy %>% unique()
 
 
-  for (i in 1:lenght(hwy_list)) {
+  for (i in 1:length(hwy_list)) {
 
     p <- database %>% filter(hwy == hwy_list[i])
     beg = workhistory %>% filter(hwy == hwy_list[i]) %>% select(proj_beg) %>% distinct()

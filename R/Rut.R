@@ -175,7 +175,7 @@ pmis_processing <- function(database) {
   return(df3)
 }
 
-#' Get the Rut work history
+#' Get the Rut work history and prepare for plotting
 #' @export
 #' @param database This is the output of the preprocessing function
 #' @param workhistory This is the output of the processing function
@@ -190,6 +190,12 @@ treat_assing <- function(database, workhistory) {
   df1 <- left_join(db.1, data1, by=c("hwy"="hwy", "UT_dfof"="UT_dfof", "UT_dfot"="UT_dfot")) %>% distinct()
 
   df1$Work_type[is.na(df1$Work_type)] <- "DN"
+
+  t <- database %>% filter(FY==2019) %>% select(hwy, UT_dfof, UT_dfot, rutl19 = rutl, rutr19 = rutr)
+  t$UT_dfof <- na_interpolation(t$UT_dfof); t$UT_dfot <- na_interpolation(t$UT_dfot)
+  t$rutl19[is.na(t$rutl19)] = 0 ; t$rutr19[is.na(t$rutr19)] = 0
+
+  t12 <- inner_join(df1 ,t, by=c("hwy"="hwy", "UT_dfof"="UT_dfof", "UT_dfot"="UT_dfot") )
 
 
   return(df1)

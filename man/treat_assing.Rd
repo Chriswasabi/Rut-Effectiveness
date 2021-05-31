@@ -2,7 +2,7 @@
 % Please edit documentation in R/Rut.R
 \name{treat_assing}
 \alias{treat_assing}
-\title{Get the Rut work history}
+\title{Get the Rut work history and prepare for plotting}
 \usage{
 treat_assing(database, workhistory)
 }
@@ -12,5 +12,5 @@ treat_assing(database, workhistory)
 \item{workhistory}{This is the output of the processing function}
 }
 \description{
-Get the Rut work history
+Get the Rut work history and prepare for plotting
 }

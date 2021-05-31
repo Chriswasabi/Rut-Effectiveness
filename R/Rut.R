@@ -165,9 +165,9 @@ pmis_processing <- function(database) {
 
   #This adds the county to the project database
   df3 <- left_join(df3, df2, by=c("FY"="FY", "proj_ID"="proj_ID", "hwy"="hwy")) %>%
-    select( FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, rutl_sum, rutr_sum, T_improv_sum, Work_type)
+    select( FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, T_improv_sum, Work_type)
 
-  df3 <- df3 %>% group_by(FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, rutl_sum, rutr_sum, T_improv_sum, Work_type) %>%
+  df3 <- df3 %>% group_by(FY, hwy, proj_ID, county , proj_len, proj_beg, proj_end, T_improv_sum, Work_type) %>%
     summarise( section_count =n() ) %>% ungroup()
 
   return(df3)

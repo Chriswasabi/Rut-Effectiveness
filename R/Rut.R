@@ -206,13 +206,13 @@ plotter <- function(database, workhistory) {
     end = end$proj_end
 
     p1 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
-      geom_line(data = p, aes(y=rutl, x =UT_dfof), color="red") +
-      geom_line(data = p, aes(y=rutl19, x =UT_dfof), color ="black")
+      geom_point(data = p, aes(y=rutl, x =UT_dfof), color="red") +
+      geom_point(data = p, aes(y=rutl19, x =UT_dfof), color ="black")
 
 
     p2 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
-      geom_line(data = p, aes(y=rutr, x =UT_dfof), color="red") +
-      geom_line(data = p, aes(y=rutr19, x =UT_dfof), color ="black")
+      geom_point(data = p, aes(y=rutr, x =UT_dfof), color="red") +
+      geom_point(data = p, aes(y=rutr19, x =UT_dfof), color ="black")
 
     p3 = plot_grid(p1,p2, nrow=2, labels = c('L', 'R'))
 

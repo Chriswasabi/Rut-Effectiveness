@@ -90,7 +90,7 @@ pmis_processing <- function(database) {
   rm(trutl, trutr, tflag)
 
   #Select only the varaibles that will be needed
-  df1 <- df %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len,dlcr,diril, dirir, drutl, drutr, sec_ID, flag_score) %>% arrange(FY,hwy,UT_dfof)
+  df1 <- df %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len, drutl, drutr, sec_ID, flag_score) %>% arrange(FY,hwy,UT_dfof)
 
   #Find sections that are next to each other (1.5 miles apart) (Im still missing the final point)
   df1 <- df1 %>% mutate(t1 = ifelse((hwy == lead(hwy, 1) & abs(UT_dfof - lead(UT_dfof, 1)) < 1.6), 1, 0),

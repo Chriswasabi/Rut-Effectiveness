@@ -214,8 +214,7 @@ plotter <- function(database, workhistory) {
       geom_point(data = p, aes(y=rutl, x =UT_dfof), color="red") +
       geom_point(data = p, aes(y=rutl19, x =UT_dfof), color ="black") +
       geom_line(data = p, aes(y=rutl, x =UT_dfof), color="red") +
-      geom_line(data = p, aes(y=rutl19, x =UT_dfof), color ="black") +
-      scale_y_reverse() +
+      geom_line(data = p, aes(y=rutl19, x =UT_dfof), color ="black") + scale_y_reverse() +
       ylab("Rutting (in.)") + xlab("Distance from Origin") +
       annotate("text", x=mid, y=rep(0.9, length(mid)), label= work)
 
@@ -225,8 +224,7 @@ plotter <- function(database, workhistory) {
       geom_point(data = p, aes(y=rutr, x =UT_dfof), color="red") +
       geom_point(data = p, aes(y=rutr19, x =UT_dfof), color ="black") +
       geom_line(data = p, aes(y=rutr, x =UT_dfof), color="red") +
-      geom_line(data = p, aes(y=rutr19, x =UT_dfof), color ="black") +
-      scale_y_continuous(limits = c(0, 1)) + scale_y_reverse() +
+      geom_line(data = p, aes(y=rutr19, x =UT_dfof), color ="black") + scale_y_reverse() +
       ylab("Rutting (in.)") + xlab("Distance from Origin") +
       annotate("text", x=mid, y=rep(0.9, length(mid)), label= work)
 

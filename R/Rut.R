@@ -87,7 +87,7 @@ pmis_processing <- function(database) {
   tflag <- quantile(df$flag_score, probs = c(0.88)) ; df <- df %>%  filter(flag_score>=tflag)
 
   #Remove all unnecessary variables
-  rm( tiril, tirir, tlcr, trutl, trutr, tflag)
+  rm(trutl, trutr, tflag)
 
   #Select only the varaibles that will be needed
   df1 <- df %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len,dlcr,diril, dirir, drutl, drutr, sec_ID, flag_score) %>% arrange(FY,hwy,UT_dfof)

@@ -54,7 +54,8 @@ pmis_preprocessing <- function(database, corrected_DFOS, min_year, max_year, asp
 #' Get the Rut work history
 #' @export
 #' @param database This is the output of the preprocessing function
-pmis_processing <- function(database) {
+#' #' @param max_year This is the maximum year you want to analyze, we recommend 2019
+pmis_processing <- function(database, max_year) {
   #First arrange the db by hwy, dfof, dfot, year
   t1 <- database %>% arrange(hwy,UT_dfof, UT_dfot, FY)
 
@@ -110,6 +111,7 @@ pmis_processing <- function(database) {
 
   #Filter out sections that are not contiguous to four other sections
   df1 <- df1 %>% filter(v>0) %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len, drutl, drutr,sec_ID)
+  df1 <- df1 %>% filter(FY<max_year)
 
   #Create a project ID
   df2 <- df1

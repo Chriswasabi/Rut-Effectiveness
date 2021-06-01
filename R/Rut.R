@@ -85,7 +85,7 @@ pmis_processing <- function(database, max_year) {
   df <- df %>% mutate(flag_score=t4+t5)
 
   #Filter out any section whose flag score is less than the flag threshold
-  tflag <- quantile(df$flag_score, probs = c(0.88)) ; df <- df %>%  filter(flag_score>=tflag)
+  tflag <- 2 ; df <- df %>%  filter(flag_score>=tflag)
 
   #Remove all unnecessary variables
   rm(trutl, trutr, tflag)

@@ -7,7 +7,6 @@ require("tidyverse")
 #' @param min_year This is the minimum year you want to analyze, we recommend 2018
 #' @param max_year This is the maximum year you want to analyze, we recommend 2019
 #' @param asphalt This parameter double checks that you are analyzing HMAs, by default it is true
-#'
 pmis_preprocessing <- function(database, corrected_DFOS, min_year, max_year, asphalt=T)  {
 
   #Rename and select the variables of interest for ACP
@@ -54,7 +53,7 @@ pmis_preprocessing <- function(database, corrected_DFOS, min_year, max_year, asp
 #' Get the Rut work history
 #' @export
 #' @param database This is the output of the preprocessing function
-#' #' @param max_year This is the maximum year you want to analyze, we recommend 2019
+#' @param max_year This is the maximum year you want to analyze, we recommend 2019
 pmis_processing <- function(database, max_year) {
   #First arrange the db by hwy, dfof, dfot, year
   t1 <- database %>% arrange(hwy,UT_dfof, UT_dfot, FY)
@@ -192,30 +191,53 @@ plotter <- function(database, workhistory) {
 
   setwd("C:/Users/Owner/Desktop/Graphs")
 
-  data <- workhistory %>% select(proj_ID, hwy, proj_beg, proj_end) %>% distinct
+
+  data <- db1 %>% select(proj_ID, hwy, proj_beg, proj_end, Work_type) %>% distinct()
+
   #Isolate the beginning of the project begin and end
   hwy_list <- data$hwy %>% unique()
 
+  i=1
 
   for (i in 1:length(hwy_list)) {
 
     p <- database %>% filter(hwy == hwy_list[i])
-    beg = workhistory %>% filter(hwy == hwy_list[i]) %>% select(proj_beg) %>% distinct()
+    beg = data %>% filter(hwy == hwy_list[i]) %>% select(proj_beg)
     beg = beg$proj_beg
-    end = workhistory %>% filter(hwy == hwy_list[i]) %>% select(proj_end) %>% distinct()
+    end = data %>% filter(hwy == hwy_list[i]) %>% select(proj_end)
     end = end$proj_end
+    mid = (end+beg)/2
+    work = data %>% filter(hwy == hwy_list[i]) %>% select(Work_type)
+    work = work$Work_type
 
     p1 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
       geom_point(data = p, aes(y=rutl, x =UT_dfof), color="red") +
-      geom_point(data = p, aes(y=rutl19, x =UT_dfof), color ="black")
+      geom_point(data = p, aes(y=rutl19, x =UT_dfof), color ="black") +
+      geom_line(data = p, aes(y=rutl, x =UT_dfof), color="red") +
+      geom_line(data = p, aes(y=rutl19, x =UT_dfof), color ="black") +
+      scale_y_reverse() +
+      ylab("Rutting (in.)") + xlab("Distance from Origin") +
+      annotate("text", x=mid, y=rep(0.9, length(mid)), label= work)
+
 
 
     p2 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
       geom_point(data = p, aes(y=rutr, x =UT_dfof), color="red") +
-      geom_point(data = p, aes(y=rutr19, x =UT_dfof), color ="black")
+      geom_point(data = p, aes(y=rutr19, x =UT_dfof), color ="black") +
+      geom_line(data = p, aes(y=rutr, x =UT_dfof), color="red") +
+      geom_line(data = p, aes(y=rutr19, x =UT_dfof), color ="black") +
+      scale_y_continuous(limits = c(0, 1)) + scale_y_reverse() +
+      ylab("Rutting (in.)") + xlab("Distance from Origin") +
+      annotate("text", x=mid, y=rep(0.9, length(mid)), label= work)
 
-    p3 = plot_grid(p1,p2, nrow=2, labels = c('L', 'R'))
+    p3 = plot_grid(
+      p1,p2, nrow=2,
+      labels = c("Left Wheelpath", "Right Wheelpath"),
+      label_size = 12,
+      label_x = 0, label_y = 0,
+      hjust = -0.5, vjust = -0.5)
 
+    p3
 
     save_plot(filename = paste0("Plot ", i, ".jpg"), p3, ncol = 1, nrow = 1, base_height = 3.71*2,
               base_asp = 1.618)

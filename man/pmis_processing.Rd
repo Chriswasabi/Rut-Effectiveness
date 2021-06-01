@@ -4,10 +4,12 @@
 \alias{pmis_processing}
 \title{Get the Rut work history}
 \usage{
-pmis_processing(database)
+pmis_processing(database, max_year)
 }
 \arguments{
 \item{database}{This is the output of the preprocessing function}
+
+\item{max_year}{This is the maximum year you want to analyze, we recommend 2019}
 }
 \description{
 Get the Rut work history

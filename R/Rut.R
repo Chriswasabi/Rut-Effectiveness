@@ -29,7 +29,7 @@ pmis_preprocessing <- function(database, corrected_DFOS, min_year, max_year, asp
 
 
   #Filter by years of interest. In this case PMIS 2017-2020
-  df <- df %>% filter(FY >= min_year)
+  df <- df %>% filter(FY >= min_year & FY<=max_year)
 
   #Filter by pvmt type, keep only ACP and remove composites and concrete pvmts
 

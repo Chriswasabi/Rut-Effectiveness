@@ -148,9 +148,9 @@ pmis_processing <- function(database, max_year) {
 
   df2 <- df2 %>% mutate( rutl=ifelse(drutl<(-0.25),1,ifelse(drutl>0.25,-1,round(drutl/(-0.25), 2))),
                          rutr=ifelse(drutr<(-0.25),1,ifelse(drutr>0.25,-1,round(drutr/(-0.25), 2))),
-                         cs=ifelse(dcs<(-25),1,ifelse(dcs>25,-1,round(dcs/(-25)*.67,2))),
-                         ds=ifelse(dds<(-20),1,ifelse(dds>20,-1,round(dds/(-25)*.67,2))),
-                         rs=ifelse(drs<(-2),1,ifelse(drs>2,-1,round(drs/(-2),2)*.67)),
+                         cs=ifelse(dcs<(-25),1,ifelse(dcs>25,-1,round(dcs/(-25)*.33,2))),
+                         ds=ifelse(dds<(-20),1,ifelse(dds>20,-1,round(dds/(-25)*.33,2))),
+                         rs=ifelse(drs<(-2),1,ifelse(drs>2,-1,round(drs/(-2),2)*.33)),
                          improv = (rutl+rutr + cs +ds +rs)/5)
 
   #Compute project limits, project length

@@ -12,7 +12,8 @@ pmis_preprocessing <- function(database, corrected_DFOS, min_year, max_year, asp
   #Rename and select the variables of interest for ACP
   df <- database %>% select(FY=EFF_YEAR, hwy=ROUTE_NAME, distr=TX_DISTRICT_NUM_ID, county=TX_COUNTY_NBR,
                             dfof=OFFSET_FROM, dfot=OFFSET_TO, pvmt_type=TX_PVMNT_TYPE_DTL_RD_LIFE_CODE,
-                            rutl=TX_ACP_RUT_LFT_WP_DPTH_MEAS,rutr=TX_ACP_RUT_RIT_WP_DPTH_MEAS)
+                            rutl=TX_ACP_RUT_LFT_WP_DPTH_MEAS,rutr=TX_ACP_RUT_RIT_WP_DPTH_MEAS,
+                            cs=TX_CONDITION_SCORE, ds=TX_DISTRESS_SCORE, rs=TX_RIDE_SCORE )
 
 
 
@@ -63,31 +64,39 @@ pmis_processing <- function(database, max_year) {
   t1$sec_ID <- group_indices(t1,hwy,UT_dfof, UT_dfot, distr,county)
 
   #Compute the difference in performance measures year(i+1)-year(i)
-  df <- t1 %>% group_by(sec_ID) %>% mutate( drutl=c(diff(rutl),NA), drutr=c(diff(rutr),NA)) %>% ungroup()
+  df <- t1 %>% group_by(sec_ID) %>% mutate( drutl=c(diff(rutl),NA), drutr=c(diff(rutr),NA),
+                                            dds=c(diff(ds),NA), drs=c(diff(rs),NA), dcs=c(diff(cs),NA)) %>% ungroup()
 
   #Define the threshold value for each distress/performance measure (first "t" means threshold)
   trutl <- quantile(df$drutl, na.rm = T, probs = c(0.1)); trutr <- quantile(df$drutr, na.rm = T, probs = c(0.1))
-
+  tds <- quantile(df$dds, na.rm = T, probs = c(0.1)) ; trs <- quantile(df$drs, na.rm = T, probs = c(0.1))
+  tcs <- quantile(df$dcs, na.rm = T, probs = c(0.1))
 
   #Flag each section based on the difference in distress/performance measures from one year to the next
   df <- df %>% mutate(
-    t4 = ifelse(drutl<=trutl, 2, 0), #Rut Left
-    t5 = ifelse(drutr<=trutr, 2.25, 0), #Rut Right
+    t1 = ifelse(dcs<=tcs, 1.5, 0), #Condition Score
+    t2 = ifelse(dds<=tds, 1, 0), #Distress Score
+    t3 = ifelse(drs<=drs, 1, 0), #Ride Score
+    t4 = ifelse(drutl<=trutl, 1.5, 0), #Rut Left
+    t5 = ifelse(drutr<=trutr, 1.5, 0), #Rut Right
   )
 
   #Convert NA's into zeroes (fix)
+  df$t1[is.na(df$t4)] <- 0
+  df$t2[is.na(df$t5)] <- 0
+  df$t3[is.na(df$t4)] <- 0
   df$t4[is.na(df$t4)] <- 0
   df$t5[is.na(df$t5)] <- 0
 
 
   #Define the Flag score
-  df <- df %>% mutate(flag_score=t4+t5)
+  df <- df %>% mutate(flag_score=t1+t2+t3+t4+t5)
 
   #Filter out any section whose flag score is less than the flag threshold
-  tflag <- 2 ; df <- df %>%  filter(flag_score>=tflag)
+  tflag <- 3 ; df <- df %>%  filter(flag_score>=tflag)
 
   #Remove all unnecessary variables
-  rm(trutl, trutr, tflag)
+  rm(trutl, trutr, tflag, tds, tcs, trs)
 
   #Select only the varaibles that will be needed
   df1 <- df %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len, drutl, drutr, sec_ID, flag_score) %>% arrange(FY,hwy,UT_dfof)
@@ -109,7 +118,7 @@ pmis_processing <- function(database, max_year) {
   )
 
   #Filter out sections that are not contiguous to four other sections
-  df1 <- df1 %>% filter(v>0) %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len, drutl, drutr,sec_ID)
+  df1 <- df1 %>% filter(v>0) %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len, drutl, drutr, dcs, dds, drs, sec_ID)
   df1 <- df1 %>% filter(FY<max_year)
 
   #Create a project ID
@@ -139,7 +148,10 @@ pmis_processing <- function(database, max_year) {
 
   df2 <- df2 %>% mutate( rutl=ifelse(drutl<(-0.25),1,ifelse(drutl>0.25,-1,round(drutl/(-0.25), 2))),
                          rutr=ifelse(drutr<(-0.25),1,ifelse(drutr>0.25,-1,round(drutr/(-0.25), 2))),
-                         improv = (rutl+rutr)/2)
+                         cs=ifelse(dcs<(-25),1,ifelse(dcs>25,-1,round(dcs/(-25),2))),
+                         ds=ifelse(dds<(-20),1,ifelse(dds>20,-1,round(dds/(-25),2))),
+                         rs=ifelse(drs<(-2),1,ifelse(drs>2,-1,round(drs/(-2),2))),
+                         improv = (rutl+rutr + cs +ds +rs)/5)
 
   #Compute project limits, project length
 

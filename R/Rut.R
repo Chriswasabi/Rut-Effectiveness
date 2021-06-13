@@ -99,7 +99,7 @@ pmis_processing <- function(database, max_year) {
   rm(trutl, trutr, tflag, tds, tcs, trs)
 
   #Select only the varaibles that will be needed
-  df1 <- df %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len, drutl, drutr, sec_ID, flag_score) %>% arrange(FY,hwy,UT_dfof)
+  df1 <- df %>% select(FY,hwy,HC,distr,county,UT_dfof,UT_dfot,sec_len,hwy_len, drutl, drutr, dcs, dds, drs, sec_ID, flag_score) %>% arrange(FY,hwy,UT_dfof)
 
   #Find sections that are next to each other (1.5 miles apart) (Im still missing the final point)
   df1 <- df1 %>% mutate(t1 = ifelse((hwy == lead(hwy, 1) & abs(UT_dfof - lead(UT_dfof, 1)) < 1.6), 1, 0),
@@ -148,9 +148,9 @@ pmis_processing <- function(database, max_year) {
 
   df2 <- df2 %>% mutate( rutl=ifelse(drutl<(-0.25),1,ifelse(drutl>0.25,-1,round(drutl/(-0.25), 2))),
                          rutr=ifelse(drutr<(-0.25),1,ifelse(drutr>0.25,-1,round(drutr/(-0.25), 2))),
-                         cs=ifelse(dcs<(-25),1,ifelse(dcs>25,-1,round(dcs/(-25),2))),
-                         ds=ifelse(dds<(-20),1,ifelse(dds>20,-1,round(dds/(-25),2))),
-                         rs=ifelse(drs<(-2),1,ifelse(drs>2,-1,round(drs/(-2),2))),
+                         cs=ifelse(dcs<(-25),1,ifelse(dcs>25,-1,round(dcs/(-25)*.67,2))),
+                         ds=ifelse(dds<(-20),1,ifelse(dds>20,-1,round(dds/(-25)*.67,2))),
+                         rs=ifelse(drs<(-2),1,ifelse(drs>2,-1,round(drs/(-2),2)*.67)),
                          improv = (rutl+rutr + cs +ds +rs)/5)
 
   #Compute project limits, project length

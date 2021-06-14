@@ -250,10 +250,10 @@ plotter <- function(database, workhistory) {
 
 
     p2 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
-      geom_point(data = p, aes(y=rutr, x =UT_dfof), color="red") +
-      geom_point(data = p, aes(y=rutr19, x =UT_dfof), color ="black") +
-      geom_line(data = p, aes(y=rutr, x =UT_dfof), color="red") +
-      geom_line(data = p, aes(y=rutr19, x =UT_dfof), color ="black") + scale_y_reverse() +
+      geom_point(data = p, aes(y=rutr, x =UT_dfof, color="red")) +
+      geom_point(data = p, aes(y=rutr19, x =UT_dfof, color ="black")) +
+      geom_line(data = p, aes(y=rutr, x =UT_dfof, color="red")) +
+      geom_line(data = p, aes(y=rutr19, x =UT_dfof, color ="black")) + scale_y_reverse() +
       ylab("Rutting (in.)") + xlab("Distance from Origin") +
       annotate("text", x=mid, y=rep(0.9, length(mid)), label= work) +
       scale_color_identity(name = "Legend",

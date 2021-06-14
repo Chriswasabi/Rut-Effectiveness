@@ -151,6 +151,10 @@ pmis_processing <- function(database, max_year) {
   # Remove NA's
   df2$drutl[is.na(df2$drutl)] <- 0
   df2$drutr[is.na(df2$drutr)] <- 0
+  df2$diril[is.na(df2$diril)] <- 0
+  df2$dirir[is.na(df2$dirir)] <- 0
+  df2$dlcr[is.na(df2$dlcr)] <- 0
+  df2$dcs[is.na(df2$dcs)] <- 0
 
   options(digits = 2)
 

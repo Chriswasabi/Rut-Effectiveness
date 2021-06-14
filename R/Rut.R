@@ -236,12 +236,16 @@ plotter <- function(database, workhistory) {
     work = work$Work_type
 
     p1 = ggplot() + geom_rect(aes(xmin = beg, xmax = end ,ymin = rep(0,length(beg)), ymax = rep(Inf,length(beg))), fill ="blue", alpha=0.2) +
-      geom_point(data = p, aes(y=rutl, x =UT_dfof), color="red") +
-      geom_point(data = p, aes(y=rutl19, x =UT_dfof), color ="black") +
-      geom_line(data = p, aes(y=rutl, x =UT_dfof), color="red") +
-      geom_line(data = p, aes(y=rutl19, x =UT_dfof), color ="black") + scale_y_reverse() +
+      geom_point(data = p, aes(y=rutl, x =UT_dfof, color="red")) +
+      geom_point(data = p, aes(y=rutl19, x =UT_dfof, color ="black")) +
+      geom_line(data = p, aes(y=rutl, x =UT_dfof, color="red")) +
+      geom_line(data = p, aes(y=rutl19, x =UT_dfof, color ="black")) + scale_y_reverse() +
       ylab("Rutting (in.)") + xlab("Distance from Origin") +
-      annotate("text", x=mid, y=rep(0.9, length(mid)), label= work)
+      annotate("text", x=mid, y=rep(0.9, length(mid)), label= work) +
+      scale_color_identity(name = "Legend",
+                           breaks = c("red", "black"),
+                           labels = c("2018", "2019"),
+                           guide = "legend" )
 
 
 
@@ -251,7 +255,11 @@ plotter <- function(database, workhistory) {
       geom_line(data = p, aes(y=rutr, x =UT_dfof), color="red") +
       geom_line(data = p, aes(y=rutr19, x =UT_dfof), color ="black") + scale_y_reverse() +
       ylab("Rutting (in.)") + xlab("Distance from Origin") +
-      annotate("text", x=mid, y=rep(0.9, length(mid)), label= work)
+      annotate("text", x=mid, y=rep(0.9, length(mid)), label= work) +
+      scale_color_identity(name = "Legend",
+                           breaks = c("red", "black"),
+                           labels = c("2018", "2019"),
+                           guide = "legend" )
 
     p3 = plot_grid(
       p1,p2, nrow=2,

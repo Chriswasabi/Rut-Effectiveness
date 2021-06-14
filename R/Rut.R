@@ -97,7 +97,7 @@ pmis_processing <- function(database, max_year) {
   hist(df$flag_score)
 
   #Filter out any section whose flag score is less than the flag threshold
-  tflag <- 3.5 ; df <- df %>%  filter(flag_score>=tflag)
+  tflag <- 3 ; df <- df %>%  filter(flag_score>=tflag)
 
 
   #Remove all unnecessary variables
@@ -164,7 +164,7 @@ pmis_processing <- function(database, max_year) {
                          iril=ifelse(diril<(-50),1,ifelse(diril>50,-1,round(diril/(-50)*.75,2))),
                          irir=ifelse(dirir<(-50),1,ifelse(dirir>50,-1,round(dirir/(-50)*.75,2))),
                          lcr=ifelse(dlcr<(-60),1,ifelse(dlcr>60,-1,round(dlcr/(-60)*.75,2))),
-                         improv = (rutl+rutr + cs +iril + irir + lcr)/5)
+                         improv = (rutl+rutr + cs +iril + irir + lcr)/6)
 
   #Compute project limits, project length
 

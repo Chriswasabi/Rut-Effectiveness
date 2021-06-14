@@ -97,7 +97,7 @@ pmis_processing <- function(database, max_year) {
   hist(df$flag_score)
 
   #Filter out any section whose flag score is less than the flag threshold
-  tflag <- 2 ; df <- df %>%  filter(flag_score>=tflag)
+  tflag <- 2.5 ; df <- df %>%  filter(flag_score>=tflag)
 
 
   #Remove all unnecessary variables
